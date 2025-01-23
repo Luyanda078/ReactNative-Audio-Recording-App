@@ -70,12 +70,22 @@ const VoiceNotesApp = () => {
       if (recording) {
         await recording.stopAndUnloadAsync();
         const uri = recording.getURI();
+
+        // Get the duration of the recording
+        const status = await recording.getStatusAsync();
+        const duration = status.durationMillis / 1000; // Duration in seconds
+
         const fileName = `${FileSystem.documentDirectory}${new Date().toISOString()}.m4a`;
 
         if (Platform.OS !== 'web') {
           await FileSystem.moveAsync({ from: uri, to: fileName });
 
-          const newRecording = { uri: fileName, date: new Date().toISOString(), name: 'Untitled' };
+          const newRecording = {
+            uri: fileName,
+            date: new Date().toISOString(),
+            name: 'Untitled',
+            duration, // Store the duration
+          };
           const updatedRecordings = [...recordings, newRecording];
           setRecordings(updatedRecordings);
 
